@@ -27,10 +27,7 @@ function getShard(string) {
     return string[2];
 }
 let clientAddress = ""
-export async function onSharding() {
-
-    let curExt = {};
-    await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
+export async function onSharding(curExt) {
     const {name, address, pubkey, contract, runMethod, callMethod} = curExt._extLib
     try {
         // const clientKeys = signerKeys(await TonClient.default.crypto.generate_random_sign_keys());
@@ -72,9 +69,7 @@ export async function onSharding() {
 }
 
 // 0:3e0b005781c00c4ace572ea9b06ff094ac3f0d1572d40f10b973492f48fd1b0f
-export async function setCreator() {
-    let curExt = {};
-    await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
+export async function setCreator(curExt) {
     const {name, address, pubkey, contract, runMethod, callMethod, internal} = curExt._extLib
 
     let checkClientExists = await checkPubKey()
@@ -110,9 +105,7 @@ export async function setCreator() {
     }
 }
 
-export async function transfer() {
-    let curExt = {};
-    await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
+export async function transfer(curExt) {
     const {name, address, pubkey, contract, runMethod, callMethod, internal} = curExt._extLib
 
     // const shardData = onSharding()
@@ -137,9 +130,7 @@ export async function transfer() {
 }
 
 
-export async function createDEXclient(shardData) {
-    let curExt = {};
-    await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
+export async function createDEXclient(curExt, shardData) {
     const {name, address, pubkey, contract, runMethod, callMethod, internal} = curExt._extLib
 
     // const shardData = onSharding()
@@ -163,11 +154,9 @@ export async function createDEXclient(shardData) {
 }
 
 export async function checkPubKey() {
-    //put curExt to global store
     let curExt = {};
     await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
     const {name, address, pubkey, contract, runMethod, callMethod} = curExt._extLib
-
 
     try {
         const rootContract = await contract(DEXrootContract.abi, Radiance.networks['2'].dexroot);
@@ -180,10 +169,7 @@ export async function checkPubKey() {
     }
 }
 
-export async function getGiverAddress() {
-    //put curExt to global store
-    let curExt = {};
-    await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
+export async function getGiverAddress(curExt) {
     const {name, address, pubkey, contract, runMethod, callMethod} = curExt._extLib
     try {
         let resp = {};
@@ -202,10 +188,7 @@ export async function getGiverAddress() {
 }
 
 
-export async function getRootData() {
-    //put curExt to global store
-    let curExt = {};
-    await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
+export async function getRootData(curExt) {
     const {name, address, pubkey, contract, runMethod, callMethod} = curExt._extLib
     try {
         let resp = {};
@@ -236,10 +219,7 @@ function hex2a(hex) {
     }
     return str;
 }
-export async function getAllPairs() {
-    //put curExt to global store
-    let curExt = {};
-    await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
+export async function getAllPairs(curExt) {
     const {name, address, pubkey, contract, runMethod, callMethod} = curExt._extLib
     try {
         const rootContract = await contract(DEXrootContract.abi, Radiance.networks['2'].dexroot);
@@ -260,6 +240,10 @@ export async function getAllPairs() {
 
             itemData.tokenA = hex2a(curRootDataA.value0.name)
             itemData.tokenB = hex2a(curRootDataB.value0.name)
+
+
+
+
 
             // itemData.rootA = {}
             // itemData.rootA.rootAaddress = item[1].root0
@@ -294,9 +278,19 @@ export async function getAllPairs() {
         return e
     }
 }
-export async function swapA(pairAddr, qtyA) {
-    let curExt = {};
-    await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
+// balanceA {value0: "13238370"}
+// run.js:448 balanceA {value0: "182355966"}
+// run.js:448 balanceA {value0: "366730233240"}
+// run.js:448 balanceA {value0: "500000000000"}
+// run.js:448 balanceA {value0: "0"}
+// run.js:448 balanceA {value0: "26688729349"}value0: "26688729349"__proto__: Object
+// run.js:448 balanceA {value0: "0"}
+// run.js:448 balanceA {value0: "26688729350"}
+// run.js:448 balanceA {value0: "500000000000"}
+// run.js:448 balanceA {value0: "0"}
+// run.js:448 balanceA {value0: "0"}
+
+export async function swapA(curExt, pairAddr, qtyA) {
     const {name, address, pubkey, contract, runMethod, callMethod} = curExt._extLib
     let getClientAddressFromRoot = await checkPubKey()
     if(getClientAddressFromRoot.status === false){
@@ -305,7 +299,7 @@ export async function swapA(pairAddr, qtyA) {
     try {
         let resp = {};
         const clientContract = await contract(DEXclientContract.abi, getClientAddressFromRoot.dexclient);
-        const processSwapA = await callMethod("processSwapA", {pairAddr:pairAddr, qtyA:qtyA}, clientContract).then(res => {
+        const processSwapA = await callMethod("processSwapA", {pairAddr:"0:7b8782447a56347d643a7d64d90efc4b07ad0e51f04088585eae6f4a8e966f68", qtyA:99999}, clientContract).then(res => {
             resp = res;
             console.log("res",res)
         }).catch(e=>console.log(e));
@@ -318,9 +312,7 @@ export async function swapA(pairAddr, qtyA) {
 }
 
 
-export async function swapB(pairAddr, qtyB) {
-    let curExt = {};
-    await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
+export async function swapB(curExt, pairAddr, qtyB) {
     const {name, address, pubkey, contract, runMethod, callMethod} = curExt._extLib
     let getClientAddressFromRoot = await checkPubKey()
     if(getClientAddressFromRoot.status === false){
@@ -329,7 +321,7 @@ export async function swapB(pairAddr, qtyB) {
     try {
         let resp = {};
         const clientContract = await contract(DEXclientContract.abi, getClientAddressFromRoot.dexclient);
-        const processSwapA = await callMethod("processSwapB", {pairAddr:pairAddr, qtyA:qtyB}, clientContract).then(res => {
+        const processSwapA = await callMethod("processSwapB", {pairAddr:"0:7b8782447a56347d643a7d64d90efc4b07ad0e51f04088585eae6f4a8e966f68", qtyB:99999}, clientContract).then(res => {
             resp = res;
             console.log("res",res)
         }).catch(e=>console.log(e));
@@ -342,68 +334,93 @@ export async function swapB(pairAddr, qtyB) {
 }
 
 
-
-export async function getClientData() {
-    let curExt = {};
-    await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
+export async function getAllClientWallets(curExt) {
     const {name, address, pubkey, contract, runMethod, callMethod} = curExt._extLib
-    let getClientAddressFromRoot = await checkPubKey()
-    if(getClientAddressFromRoot.status === false){
-        return getClientAddressFromRoot
-    }
+
+
+    // let getClientAddressFromRoot = await checkPubKey()
+    // if(getClientAddressFromRoot.status === false){
+    //     return getClientAddressFromRoot
+    // }
+//TODO get from global store client address >>> if np client return - checkPubkey too low
+//     let clientAddress = "0:7d0f794a34e1645ab920f5737d19435415dd07331f02eb02b7bc41727448da43"
     try {
-        const clientContract = await contract(DEXclientContract.abi, getClientAddressFromRoot.dexclient);
-        let soUINT = await runMethod("soUINT", {}, clientContract)
-        let rootConnector = await runMethod("rootConnector", {}, clientContract)
-        let rootDEX = await runMethod("rootDEX", {}, clientContract)
-        let pairs = await runMethod("pairs", {}, clientContract)
+        const clientContract = await contract(DEXclientContract.abi, "0:7d0f794a34e1645ab920f5737d19435415dd07331f02eb02b7bc41727448da43");
+        let clientWallets = await runMethod("rootWallet", {}, clientContract)
+        let normlizeWallets = []
+        for (const item of Object.entries(clientWallets.rootWallet)) {
+
+            const curWalletContract = await contract(TONTokenWalletContract.abi, item[1]);
+            const curRootContract = await contract(RootTokenContract.abi, item[0]);
+
+            let curWalletData = await runMethod("getDetails", {_answer_id:0}, curWalletContract)
+            let curRootData = await runMethod("getDetails", {_answer_id:0}, curRootContract)
+            let itemData = {};
+
+            itemData.walletAddress = item[1];
+
+
+            itemData.symbol = hex2a(curRootData.value0.symbol);
+            itemData.balance = +curWalletData.value0.balance / 1000000000;
+
+            normlizeWallets.push(itemData)
+
+    }
+        console.log("normlizeWallets",normlizeWallets)
+        return normlizeWallets
+    } catch (e) {
+        console.log("catch E", e);
+        return e
+    }
+}
+
+
+export async function getAllExistingPairs(curExt) {
+    const {contract, runMethod} = curExt._extLib
+    // let getClientAddressFromRoot = await checkPubKey()
+    // if(getClientAddressFromRoot.status === false){
+    //     return getClientAddressFromRoot
+    // }
+//TODO get from global store client address
+//     let clientAddress = "0:7d0f794a34e1645ab920f5737d19435415dd07331f02eb02b7bc41727448da43"
+    try {
+        const rootContract = await contract(DEXrootContract.abi, Radiance.networks['2'].dexroot);
+        let pairs = await runMethod("pairs", {}, rootContract)
 
         let normlizeWallets = []
         for (const item of Object.entries(pairs.pairs)) {
-            const curRootTokenA = await contract(RootTokenContract.abi, item[1].rootA);
-            const curRootTokenB = await contract(RootTokenContract.abi, item[1].rootB);
-            const curRootTokenAB = await contract(RootTokenContract.abi, item[1].rootAB);
+            // console.log("pairs.pairs",item)
+            const curRootTokenA = await contract(RootTokenContract.abi, item[1].root0);
+            const curRootTokenB = await contract(RootTokenContract.abi, item[1].root1);
+            const curRootTokenAB = await contract(RootTokenContract.abi, item[1].rootLP);
+            const pairContract = await contract(DEXPairContract.abi, item[0]);
+
+            let bal = await runMethod("balanceReserve", {}, pairContract)
+
             let curRootDataA = await runMethod("getDetails", {_answer_id:0}, curRootTokenA)
             let curRootDataB = await runMethod("getDetails", {_answer_id:0}, curRootTokenB)
             let curRootDataAB = await runMethod("getDetails", {_answer_id:0}, curRootTokenAB)
+
             let itemData = {};
             itemData.pairAddress = item[0];
-            itemData.walletAaddress = item[1].walletA
-            let curA = await getWalletData(item[1].walletA)
-            itemData.walletA = curA.value0
-            itemData.walletA.name = hex2a(curRootDataA.value0.name)
-            itemData.walletA.symbol = hex2a(curRootDataA.value0.symbol) === 'WTON' ? 'TON' : hex2a(curRootDataA.value0.symbol)
-            itemData.walletA.decimals = curRootDataA.value0.decimals
-            itemData.walletBaddress = item[1].walletB
+            itemData.pairname = hex2a(curRootDataAB.value0.name)
+            itemData.nameWalletA = hex2a(curRootDataA.value0.name)
+            itemData.balanceWalletA = bal.balanceReserve[item[1].root0]
 
-            let curB = await getWalletData(item[1].walletB)
-            itemData.walletB = curB.value0
-            itemData.walletB.name = hex2a(curRootDataB.value0.name)
-            itemData.walletB.symbol = hex2a(curRootDataB.value0.symbol) === 'WTON' ? 'TON' : hex2a(curRootDataB.value0.symbol)
-            itemData.walletB.decimals = curRootDataB.value0.decimals
-            itemData.rootAB = {}
-            itemData.rootAB.name = hex2a(curRootDataAB.value0.name)
-            itemData.rootAB.symbol = hex2a(curRootDataAB.value0.symbol)
-            itemData.rootAB.decimals = curRootDataAB.value0.decimals
-
+            itemData.nameWalletB = hex2a(curRootDataB.value0.name)
+            itemData.balanceWalletB = bal.balanceReserve[item[1].root1]
 
             normlizeWallets.push(itemData)
         }
-        let rootWallet = await runMethod("rootWallet", {}, clientContract)
-        let getAllDataPreparation = await runMethod("getAllDataPreparation", {}, clientContract)
-        let counterCallback = await runMethod("counterCallback", {}, clientContract)
-
-        console.log( {address, normlizeWallets,...soUINT,...rootConnector,...rootDEX,...pairs,...rootWallet,...getAllDataPreparation,...counterCallback})
-        return {address, normlizeWallets,...soUINT,...rootConnector,...rootDEX,...pairs,...rootWallet,...getAllDataPreparation,...counterCallback}
+        console.log("{normlizeWallets}",normlizeWallets)
+        return normlizeWallets
     } catch (e) {
         console.log("catch E", e);
         return e
    }
 }
 
-export async function getPairReserves(walletAadrress, walletBaddress) {
-    let curExt = {};
-    await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
+export async function getPairReserves(curExt, walletAadrress, walletBaddress) {
     const {name, address, pubkey, contract, runMethod, callMethod} = curExt._extLib
     try {
         const walletA = await contract(TONTokenWalletContract.abi, walletAadrress);
@@ -425,18 +442,23 @@ console.log("balanceA",balanceA,"balanceB",balanceB)
         return e
     }
 }
-export async function getWalletBalance(walletAddress) {
-    let curExt = {};
-    await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
+
+
+
+export async function getval() {
+    let wallets = ["0:7e0457591e59add970bfa95c87d8b1d6c13e0677411c93c057a1706184e9b6ab","0:7823d7b9083c54a9176509b294386f020106dc6e53e77970d6726d7da97bc857"]
+
+    wallets.map(item=>console.log(getWalletBalance(item)))
+}
+
+
+export async function getWalletBalance(curExt, walletAddress) {
     const {name, address, pubkey, contract, runMethod, callMethod} = curExt._extLib
     try {
         const wallet = await contract(TONTokenWalletContract.abi, walletAddress);
         let balance = await runMethod("balance", {_answer_id:0}, wallet).catch(e=>console.log(e))
 
-
-        console.log("balanceA",balance)
-
-
+        console.log("balance",balance)
         return balance
     } catch (e) {
         console.log("catch E", e);
@@ -445,9 +467,7 @@ export async function getWalletBalance(walletAddress) {
 }
 
 
-export async function processLiquidity(pairAddr, qtyA, qtyB) {
-    let curExt = {};
-    await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
+export async function processLiquidity(curExt, pairAddr, qtyA, qtyB) {
     const {name, address, pubkey, contract, runMethod, callMethod} = curExt._extLib
     let getClientAddressFromRoot = await checkPubKey()
     if(getClientAddressFromRoot.status === false){
@@ -464,9 +484,7 @@ export async function processLiquidity(pairAddr, qtyA, qtyB) {
 }
 
 
-export async function getWalletData(walletAddress) {
-    let curExt = {};
-    await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
+export async function getWalletData(curExt, walletAddress) {
     const {name, address, pubkey, contract, runMethod, callMethod} = curExt._extLib
     try {
         const wallet = await contract(TONTokenWalletContract.abi, walletAddress);
@@ -480,9 +498,7 @@ export async function getWalletData(walletAddress) {
 /*
     pairAddr type string
  */
-export async function connectToPair(pairAddr) {
-    let curExt = {};
-    await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
+export async function connectToPair(curExt, pairAddr) {
     const {name, address, pubkey, contract, runMethod, callMethod, internal} = curExt._extLib
     let getClientAddressFromRoot = await checkPubKey()
     if(getClientAddressFromRoot.status === false){
@@ -505,9 +521,7 @@ export async function connectToPair(pairAddr) {
     }
 }
 
-export async function getClientForConnect() {
-    let curExt = {};
-    await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
+export async function getClientForConnect(curExt) {
     const {name, address, pubkey, contract, runMethod, callMethod} = curExt._extLib
     let getClientAddressFromRoot = await checkPubKey()
     if(getClientAddressFromRoot.status === false){
@@ -527,9 +541,7 @@ export async function getClientForConnect() {
 }
 
 
-export async function connectToPairStep2DeployWallets() {
-    let curExt = {};
-    await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
+export async function connectToPairStep2DeployWallets(curExt) {
     const {name, address, pubkey, contract, runMethod, callMethod, internal} = curExt._extLib
     let getClientAddressFromRoot = await checkPubKey()
     if(getClientAddressFromRoot.status === false){

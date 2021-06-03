@@ -16,14 +16,12 @@ const initialState = {
   fromInputValue: 0,
   toInputValue: 0,
   fromToken: {
-    id: '',
     walletAddress: '',
     symbol: '',
     icon: '',
     balance: 0
   },
   toToken: {
-    id: '',
     walletAddress: '',
     symbol: '',
     icon: '',

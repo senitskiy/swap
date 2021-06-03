@@ -1,5 +1,6 @@
 import {
   CHANGE_THEME,
+  SET_CUR_EXT,
   CONNECT_WALLET,
   SET_WALLET_IS_CONNECTED,
   CLOSE_CONNECTING,
@@ -11,6 +12,7 @@ import {
 
 const initialState = {
   appTheme: null,
+  curExt: {},
   walletIsConnected: false,
   connectingWallet: false,
   accountIsVisible: false,
@@ -23,6 +25,11 @@ const appReducer = (state = initialState, { type, payload }) => {
       return {
         ...state,
         appTheme: payload
+      }
+    case SET_CUR_EXT: 
+      return {
+        ...state,
+        curExt: payload
       }
     case CONNECT_WALLET: 
       return {

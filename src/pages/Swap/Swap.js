@@ -33,16 +33,10 @@ function Swap () {
 
   function handleConfirm() {
     if(fromToken.symbol && toToken.symbol && fromValue) {
-      // tokenList.forEach(i => {
-      //   if(i.id === fromToken.id) {
-      //     if(fromValue > i.balance ) {
-      //       dispatch(showPopup({type: 'error', message: 'Excess of balance'}));
-      //       return;
-      //     }
-      //     else {
-      //     }
-      //   }
-      // })
+      if(fromValue > fromToken.balance ) {
+        dispatch(showPopup({type: 'error', message: 'Excess of balance'}));
+        return;
+      }
       setSwapConfirmPopupIsVisible(true);
     } else {
       dispatch(showPopup({type: 'error', message: 'Fields should not be empty'}));
@@ -84,10 +78,10 @@ function Swap () {
                 value={toValue.toFixed(4)}
               />
               { walletIsConnected ?
-                <button className={(fromToken.id && toToken.id && fromValue && toValue) ? "btn mainblock-btn" : "btn mainblock-btn btn--disabled"} onClick={() => handleConfirm()}>Swap</button> :
+                <button className={(fromToken.symbol && toToken.symbol && fromValue && toValue) ? "btn mainblock-btn" : "btn mainblock-btn btn--disabled"} onClick={() => handleConfirm()}>Swap</button> :
                 <button className="btn mainblock-btn" onClick={() => dispatch(connectWallet())}>Connect wallet</button>
               }
-              { (fromToken.id && toToken.id) && <p className="swap-rate">Price <span>{rate} {toToken.symbol}</span> per <span>{fromToken.symbol}</span></p> }
+              { (fromToken.symbol && toToken.symbol) && <p className="swap-rate">Price <span>{rate} {toToken.symbol}</span> per <span>{fromToken.symbol}</span></p> }
               
             </div>
           }

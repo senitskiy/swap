@@ -1,5 +1,6 @@
 import {
   CHANGE_THEME,
+  SET_CUR_EXT,
   CONNECT_WALLET,
   CLOSE_CONNECTING,
   SET_WALLET_IS_CONNECTED,
@@ -14,6 +15,10 @@ export function changeTheme(payload) {
   localStorage.setItem('appTheme', payload);
   return { type: CHANGE_THEME, payload };
 };
+
+export function setCurExt(payload) {
+  return { type: SET_CUR_EXT, payload }
+}
 
 export function connectWallet() {
   return { type: CONNECT_WALLET }

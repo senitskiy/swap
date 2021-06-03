@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 import {useSelector, useDispatch} from 'react-redux';
 import {Switch, Route, Redirect, useLocation, Prompt} from 'react-router-dom';
-import {changeTheme, showPopup} from './store/actions/app';
+import {changeTheme, setCurExt, showPopup} from './store/actions/app';
 import {setPairsList} from './store/actions/wallet';
 import {runContractR1Method} from './freeton';
 import Swap from './pages/Swap/Swap';
@@ -10,6 +10,8 @@ import Popup from './components/Popup/Popup';
 import Header from './components/Header/Header'
 import Manage from './pages/Manage/Manage';
 import AddLiquidity from './components/AddLiquidity/AddLiquidity';
+import { getAllPairsWoithoutProvider } from './extensions/webhook/script';
+import { checkExtensions, getCurrentExtension } from './extensions/extensions/checkExtensions';
 
 function App() {
   const dispatch = useDispatch();
@@ -18,18 +20,19 @@ function App() {
   const walletIsConnected = useSelector(state => state.appReducer.walletIsConnected);
   const swapAsyncIsWaiting = useSelector(state => state.swapReducer.swapAsyncIsWaiting);
 
-  useEffect(() => {
+  useEffect(async () => {
     const theme = localStorage.getItem('appTheme') === null ? 'light' : localStorage.getItem('appTheme');
     dispatch(changeTheme(theme));
+
+    let curExt = {};
+    await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
+    dispatch(setCurExt(curExt));
     
-    // setInterval(async () => {
-    //   try {
-    //     dispatch(setPairsList(await runContractR1Method()));
-    //   } catch {
-    //     return;
-    //   }
-    // }, 3000);
+    let pairs = await getAllPairsWoithoutProvider();
+    dispatch(setPairsList(pairs))
+
   }, []);
+  
 
   useEffect(() => {
     window.addEventListener('beforeunload', function(e) {

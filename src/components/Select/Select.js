@@ -39,62 +39,60 @@ function Select(props) {
     
     pairsList.forEach(i => {
       fromArr.push({
-        id: i.walletA.root_address,
-        walletAddress: i.walletAaddress,
-        symbol: i.walletA.symbol,
-        balance: +i.walletA.balance / 1000000000
+        walletAddress: '',
+        symbol: i.symbolA,
+        balance: 0
       })
       fromArr.push({
-        id: i.walletB.root_address,
-        walletAddress: i.walletBaddress,
-        symbol: i.walletB.symbol,
-        balance: +i.walletB.balance / 1000000000
+        walletAddress: '',
+        symbol: i.symbolB,
+        balance: 0
       })
     })
     
-    fromArr = fromArr.filter((i, index, arr) => arr.findIndex(j => (j.id === i.id)) === index);
+    fromArr = fromArr.filter((i, index, arr) => arr.findIndex(j => (j.symbol === i.symbol)) === index);
     
-    // fromArr.forEach((i, index) => {
-    //   tokenList.forEach(j => {
-    //     if(i.id === j.id) {
-    //       fromArr[index].balance = j.balance
-    //     }
-    //   })
-    // })
+    fromArr.forEach((i, index) => {
+      tokenList.forEach(j => {
+        if(i.symbol === j.symbol) {
+          fromArr[index].balance = j.balance;
+          fromArr[index].walletAddress = j.walletAddress;
+        }
+      })
+    })
     
     // setFromTokenList(fromArr);
 
     let toArr = [];
     if(props.type === 'to') {
-      const arr = pairsList.filter(i => i.walletA.root_address === fromToken.id || i.walletB.root_address === fromToken.id);
+      const arr = pairsList.filter(i => i.symbolA === fromToken.symbol || i.symbol === fromToken.symbol);
 
       arr.forEach(i => {
-        if(fromToken.id === i.walletA.root_address) {
+        if(fromToken.id === i.symbol) {
           toArr.push({              
             pairId: i.pairAddress,
-            id: i.walletB.root_address,
-            walletAddress: i.walletBaddress,
-            symbol: i.walletB.symbol,
-            balance: +i.walletB.balance / 1000000000
+            walletAddress: '',
+            symbol: i.symbolB,
+            balance: 0
           });
-        } else if(fromToken.id === i.walletB.root_address) {
+        } else if(fromToken.id === i.symbol) {
           toArr.push({              
             pairId: i.pairAddress,
-            id: i.walletA.root_address,
-            walletAddress: i.walletAaddress,
-            symbol: i.walletA.symbol,
-            balance: +i.walletA.balance / 1000000000
+            walletAddress: '',
+            symbol: i.symbolA,
+            balance: 0
           });
         }
       })
 
-      // toArr.forEach((i, index) => {
-      //   tokenList.forEach(j => {
-      //     if(i.id === j.id) {
-      //       toArr[index].balance = j.balance
-      //     }
-      //   })
-      // })
+      toArr.forEach((i, index) => {
+        tokenList.forEach(j => {
+          if(i.symbol === j.symbol) {
+            toArr[index].balance = j.balance;
+            toArr[index].walletAddress = j.walletAddress;
+          }
+        })
+      })
 
       // setToTokenList(toArr);
     }
@@ -116,7 +114,7 @@ function Select(props) {
         title={'Select a token'}
         button={<CloseBtn func={handleClose()} />}
         content={
-          !isLoading ? <Loader /> :
+          !pairsList.length ? <Loader /> :
           (<>
             <SearchInput func={setFilter.bind(this)} />
             <div className="select-list">
@@ -127,12 +125,11 @@ function Select(props) {
                   .map(item => (
                     <SelectItem
                       type={props.type}
-                      id={item.id}
                       walletAddress={item.walletAddress}
                       symbol={item.symbol}
                       balance={item.balance}
                       isActive={fromToken.symbol === item.symbol}
-                      key={item.id}
+                      key={item.symbol}
                     />
                 ))                  
               )}
@@ -144,12 +141,11 @@ function Select(props) {
                     <SelectItem
                       type={props.type}
                       pairId={item.pairId}
-                      id={item.id}
                       walletAddress={item.walletAddress}
                       symbol={item.symbol}
                       balance={item.balance}
                       isActive={toToken.symbol === item.symbol}
-                      key={item.id}
+                      key={item.symbol}
                     />
                 ))
               )}

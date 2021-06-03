@@ -37,6 +37,12 @@ export async function getCurrentExtension(extensionsArry) {
             return item.current === true
         }
     );
+    // if(curExtension.length === 0){
+    //     console.log("0000000>>>>>>no extension",curExtension)
+    //     extensionsArry[0]._extLib = await extraton()
+    //     extensionsArry[0].name = "testing extraton"
+    //     return extensionsArry[0]
+    // }
     if (curExtension[0].name === "extraton") {
         curExtension[0]._extLib = await extraton()
     } else {
@@ -46,6 +52,7 @@ export async function getCurrentExtension(extensionsArry) {
     if (curExtension.length > 1) {
         return curExtension[0]
     }
+    console.log("no provided extension")
     return curExtension[0]
 }
 

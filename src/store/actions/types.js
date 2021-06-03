@@ -1,6 +1,8 @@
 // app
 export const CHANGE_THEME = 'CHANGE_THEME';
 
+export const SET_CUR_EXT = 'SET_CUR_EXT';
+
 export const CONNECT_WALLET = 'CONNECT_WALLET';
 export const CLOSE_CONNECTING = 'CLOSE_CONNECTING';
 

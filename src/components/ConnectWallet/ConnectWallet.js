@@ -9,12 +9,15 @@ import Loader from '../Loader/Loader';
 import './ConnectWallet.scss';
 import { setSwapFromToken, setSwapToToken } from '../../store/actions/swap';
 import { setPoolFromToken, setPoolToToken } from '../../store/actions/pool';
-import { getClientData, getRootData, getAllPairs, getWalletBalance } from '../../extensions/sdk/run';
+import { getRootData, getAllPairs, getWalletBalance, getAllClientWallets } from '../../extensions/sdk/run';
+import { getClientBalance } from '../../extensions/webhook/script';
 
 function ConnectWallet() {
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(true);
   const [extIsAvailable, setExtIsAvailable] = useState(null);
+
+  let curExt = useSelector(state => state.appReducer.curExt);
 
   let swapFromToken = useSelector(state => state.swapReducer.fromToken);
   let swapToToken = useSelector(state => state.swapReducer.toToken);
@@ -25,15 +28,52 @@ function ConnectWallet() {
   useEffect(() => {
     (async function() {
       try {
-        const clientData = await getClientData();
-        const walletId = clientData.address;
-        const pairs = clientData.normlizeWallets;
-        dispatch(setWallet({id: walletId, balance: 0}));
-        dispatch(setPairsList(pairs));
+        // const clientData = await getClientData();
+        // const walletId = clientData.address;
+        // const pairs = clientData.normlizeWallets;
+        // dispatch(setWallet({id: walletId, balance: 0}));
+        // dispatch(setPairsList(pairs));
+        // dispatch(setWalletIsConnected(true));
+        // dispatch(closeConnecting());
+        const walletAddress = curExt._extLib.address;
+        const clientBalance = await getClientBalance(walletAddress);
+        let tokenList = await getAllClientWallets(curExt);
+        tokenList = tokenList.filter(i => !i.symbol.includes('/')).map(i => (
+          {
+            ...i,
+            symbol: i.symbol === 'WTON' ? 'TON' : i.symbol
+          })
+        );
+        
+        dispatch(setTokenList(tokenList));
+        dispatch(setWallet({id: walletAddress, balance: clientBalance}));
+
+        tokenList.forEach(i => {
+          if(swapFromToken.symbol === i.symbol) {
+            swapFromToken.balance = i.balance;
+            swapFromToken.walletAddress = i.walletAddress;
+            dispatch(setSwapFromToken(swapFromToken));
+          } else if(swapToToken.symbol === i.symbol) {
+            swapToToken.balance = i.balance;
+            swapToToken.walletAddress = i.walletAddress;
+            dispatch(setSwapToToken(swapToToken));
+          } else if(poolFromToken.symbol === i.symbol) {
+            poolFromToken.balance = i.balance;
+            poolFromToken.walletAddress = i.walletAddress;
+            dispatch(setPoolFromToken(poolFromToken));
+          } else if(poolToToken.symbol === i.symbol) {
+            poolToToken.balance = i.balance;
+            poolToToken.walletAddress = i.walletAddress;
+            dispatch(setPoolToToken(poolToToken));
+          }
+        })
+
         dispatch(setWalletIsConnected(true));
         dispatch(closeConnecting());
       } catch (err) {
         console.log(err);
+        dispatch(closeConnecting());
+        dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
       }
       // try {
       //   let pubKey = await checkPubKey();

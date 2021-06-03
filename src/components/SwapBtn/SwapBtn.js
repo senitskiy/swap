@@ -8,7 +8,7 @@ function SwapBtn(props) {
   function handleClick() {
     const {fromToken, toToken} = props;
 
-    if(fromToken.id && toToken.id) {
+    if(fromToken.symbol && toToken.symbol) {
       dispatch(setSwapFromToken(toToken));
       dispatch(setSwapToToken(fromToken));
     }

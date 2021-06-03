@@ -37,33 +37,23 @@ function Input(props) {
   const [value, setValue] = useState(props.value);
 
   useEffect(async () => {
-    if(location.pathname.includes('swap') && swapFromToken.id && swapToToken.id) {
-      // pairsList.forEach(i => {
-      //   if(i.symbolA === swapFromToken.symbol && i.symbolB === swapToToken.symbol) {
-      //     dispatch(setSwapRate(i.rateAB));
-      //   } else if(i.symbolB === swapFromToken.symbol && i.symbolA === swapToToken.symbol) {
-      //     dispatch(setSwapRate(i.rateBA));
-      //   }
-      // })
-
-      // get reserves
-      const reserves = await getPairReserves(swapFromToken.walletAddress, swapToToken.walletAddress);
-      const rate = +reserves.balanceA.value0 / +reserves.balanceB.value0;
-      dispatch(setSwapRate(rate));
+    if(location.pathname.includes('swap') && swapFromToken.symbol && swapToToken.symbol) {
+      pairsList.forEach(i => {
+        if(i.symbolA === swapFromToken.symbol && i.symbolB === swapToToken.symbol) {
+          dispatch(setSwapRate(i.rateAB));
+        } else if(i.symbolB === swapFromToken.symbol && i.symbolA === swapToToken.symbol) {
+          dispatch(setSwapRate(i.rateBA));
+        }
+      })
     }
-    if(location.pathname.includes('add-liquidity') && poolFromToken.id && poolToToken.id) {
-      // pairsList.forEach(i => {
-      //   if(i.symbolA === poolFromToken.symbol && i.symbolB === poolToToken.symbol) {
-      //     dispatch(setPoolRate(i.rateAB));
-      //   } else if(i.symbolB === poolFromToken.symbol && i.symbolA === poolToToken.symbol) {
-      //     dispatch(setPoolRate(i.rateBA));
-      //   }
-      // })
-
-      // get reserves
-      const reserves = await getPairReserves(poolFromToken.walletAddress, poolToToken.walletAddress);
-      const rate = +reserves.balanceA.value0 / +reserves.balanceB.value0;
-      dispatch(setPoolRate(rate));
+    if(location.pathname.includes('add-liquidity') && poolFromToken.symbol && poolToToken.symbol) {
+      pairsList.forEach(i => {
+        if(i.symbolA === poolFromToken.symbol && i.symbolB === poolToToken.symbol) {
+          dispatch(setPoolRate(i.rateAB));
+        } else if(i.symbolB === poolFromToken.symbol && i.symbolA === poolToToken.symbol) {
+          dispatch(setPoolRate(i.rateBA));
+        }
+      })
     }
   }, [swapFromToken, swapToToken, poolFromToken, poolToToken, pairsList])
   
@@ -76,13 +66,13 @@ function Input(props) {
     try {
       await _.checkExtensionAvailability();
       if(location.pathname.includes('swap')) {
-        if(props.type === 'to' && !swapFromToken.id) {
+        if(props.type === 'to' && !swapFromToken.symbol) {
           dispatch(showPopup({type: 'error', message: 'Please, choose from token first.'}));
         } else {
           dispatch(props.type === 'from' ? showSwapFromSelect() : showSwapToSelect());
         }
       } else if(location.pathname.includes('add-liquidity')) {
-        if(props.type === 'to' && !poolFromToken.id) {
+        if(props.type === 'to' && !poolFromToken.symbol) {
           dispatch(showPopup({type: 'error', message: 'Please, choose from token first.'}));
         } else {
           dispatch(props.type === 'from' ? showPoolFromSelect() : showPoolToSelect());

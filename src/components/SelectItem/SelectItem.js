@@ -22,16 +22,14 @@ function SelectItem(props) {
     if(props.isActive) { return }
     if(props.type ==='from') {
       const payload = {
-        id: props.id,
-        walletAddress: props.walletAddress,
+        walletAddress: '',
         symbol: props.symbol,
         balance: props.balance
       }
       if(location.pathname.includes('swap')) {
         dispatch(setSwapFromToken(payload));
-        if(swapToToken.id) {
+        if(swapToToken.symbol) {
           const payload = {
-            id: '',
             walletAddress: '',
             symbol: '',
             balance: 0
@@ -43,9 +41,8 @@ function SelectItem(props) {
         dispatch(hideSwapFromSelect());
       } else {
         dispatch(setPoolFromToken(payload));
-        if(poolToToken.id) {
+        if(poolToToken.symbol) {
           const payload = {
-            id: '',
             walletAddress: '',
             symbol: '',
             balance: 0
@@ -59,8 +56,7 @@ function SelectItem(props) {
     }
     if(props.type === 'to') {      
       const payload = {
-        id: props.id,
-        walletAddress: props.walletAddress,
+        walletAddress: '',
         symbol: props.symbol,
         balance: props.balance
       }

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { connectDEXpair, getClientPairs, getClientRoots, getWallet, swap } from '../../freeton';
-import { getClientData, swapA, swapB } from '../../extensions/sdk/run';
+import { swapA, swapB } from '../../extensions/sdk/run';
 import { showPopup } from '../../store/actions/app';
 import { setSwapAsyncIsWaiting, setSwapFromInputValue, setSwapFromToken, setSwapToInputValue, setSwapToToken } from '../../store/actions/swap';
 import { setPairsList, setTokenList } from '../../store/actions/wallet';
@@ -15,6 +15,8 @@ function SwapConfirmPopup(props) {
   const dispatch = useDispatch();
 
   const appTheme = useSelector(state => state.appReducer.appTheme);
+
+  let curExt = useSelector(state => state.appReducer.curExt);
 
   const fromToken = useSelector(state => state.swapReducer.fromToken);
   const toToken = useSelector(state => state.swapReducer.toToken);
@@ -69,10 +71,10 @@ function SwapConfirmPopup(props) {
 
     try {
       await pairsList.forEach(async i => {
-        if(fromToken.walletAddress === i.walletAaddress && toToken.walletAddress === i.walletBaddress) {
-          await swapA(pairId, fromValue * 10000000000);
-        } else if(fromToken.walletAddress === i.walletBaddress && toToken.walletAddress === i.walletAaddress) {
-          await swapB(pairId, fromValue * 10000000000);
+        if(fromToken.symbol === i.symbolA && toToken.symbol === i.symbolB) {
+          await swapA(curExt, pairId, fromValue * 1000000000);
+        } else if(fromToken.symbol === i.symbolB && toToken.symbol === i.symbolA) {
+          await swapB(curExt, pairId, fromValue * 1000000000);
         }
       })
       // await swap(pairId, fromValue, fromToken);
@@ -87,18 +89,13 @@ function SwapConfirmPopup(props) {
       //     }
       //   }
       // })
-      const clientData = await getClientData();
-      const pairs = clientData.normlizeWallets;
-      dispatch(setPairsList(pairs));
 
       dispatch(setSwapFromToken({
-        id: '',
         walletAddress: '',
         symbol: '',
         balance: 0
       }));
       dispatch(setSwapToToken({
-        id: '',
         walletAddress: '',
         symbol: '',
         balance: 0
@@ -153,7 +150,7 @@ function SwapConfirmPopup(props) {
               <span className="confirm-value"><img className="confirm-icon" src={iconGenerator(toToken.symbol)} alt={toToken.symbol}/>{toValue.toFixed(4)}</span>
             </div>
             <p className="confirm-text">
-              Outpoot is estimated. You will receive at least <span>3.24204 UNI</span> or the transaction will revert
+              Outpoot is estimated. You will receive at least <span>{toValue.toFixed(4)} {toToken.symbol}</span> or the transaction will revert
             </p>
             <button className="btn popup-btn" onClick={() => handleSwap()}>Confirm Swap</button>
           </>
@@ -163,11 +160,11 @@ function SwapConfirmPopup(props) {
             <div className="mainblock-footer-wrap">
               <div>
                 <div className="swap-confirm-wrap">
-                  <p className="mainblock-footer-value"><img src={miniSwap} alt=""/> 3.2582 UNI/ETH</p>
+                  <p className="mainblock-footer-value"><img src={miniSwap} alt=""/> {toValue.toFixed(4)} {toToken.symbol}/{fromToken.symbol}</p>
                   <p className="mainblock-footer-subtitle">Price</p>
                 </div>
                 <div>
-                  <p className="mainblock-footer-value">3.242 UNI</p>
+                  <p className="mainblock-footer-value">{toValue.toFixed(4)} {toToken.symbol}</p>
                   <p className="mainblock-footer-subtitle">Minimum received</p>
                 </div>
               </div>
@@ -177,7 +174,7 @@ function SwapConfirmPopup(props) {
                   <p className="mainblock-footer-subtitle">Price Impact</p>
                 </div>
                 <div>
-                  <p className="mainblock-footer-value">0.003 ETH</p>
+                  <p className="mainblock-footer-value">0.003 {toToken.symbol}</p>
                   <p className="mainblock-footer-subtitle">Liquidity Provider Fee</p>
                 </div>
               </div>
